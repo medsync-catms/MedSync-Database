@@ -44,7 +44,7 @@ CREATE TABLE branch_hours (
 
 -- Users table
 CREATE TABLE users (
-    id TEXT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     username TEXT UNIQUE NOT NULL,
     password_hash TEXT NOT NULL,
     role role NOT NULL,
@@ -62,7 +62,7 @@ CREATE TABLE specialties (
 -- Medical staff table
 CREATE TABLE medical_staff (
     id SERIAL PRIMARY KEY,
-    user_id TEXT NOT NULL REFERENCES users(id),
+    user_id INTEGER NOT NULL REFERENCES users(id),
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
     specialty_id INTEGER REFERENCES specialties(id),
@@ -76,7 +76,7 @@ CREATE TABLE medical_staff (
 
 -- Patients table
 CREATE TABLE patients (
-    id TEXT PRIMARY KEY, -- Format: COL001, KDY001, GAL001
+    id SERIAL PRIMARY KEY,
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
     date_of_birth DATE NOT NULL,
@@ -93,7 +93,7 @@ CREATE TABLE patients (
 -- Patient emergency contacts table
 CREATE TABLE patient_contacts (
     id SERIAL PRIMARY KEY,
-    patient_id TEXT NOT NULL REFERENCES patients(id),
+    patient_id INTEGER NOT NULL REFERENCES patients(id),
     name TEXT NOT NULL,
     phone TEXT NOT NULL,
     relation TEXT NOT NULL,
@@ -110,7 +110,6 @@ CREATE TABLE treatment_categories (
 -- Treatments/Services catalog table
 CREATE TABLE treatments (
     id SERIAL PRIMARY KEY,
-    service_code TEXT UNIQUE NOT NULL,
     name TEXT NOT NULL,
     description TEXT,
     price DECIMAL(10,2) NOT NULL CHECK (price >= 0),
@@ -123,7 +122,7 @@ CREATE TABLE treatments (
 -- Appointments table
 CREATE TABLE appointments (
     id SERIAL PRIMARY KEY,
-    patient_id TEXT NOT NULL REFERENCES patients(id),
+    patient_id INTEGER NOT NULL REFERENCES patients(id),
     doctor_id INTEGER NOT NULL REFERENCES medical_staff(id),
     branch_id INTEGER NOT NULL REFERENCES branches(id),
     appointment_datetime TIMESTAMP NOT NULL,
@@ -151,7 +150,7 @@ CREATE TABLE treatment_records (
 -- Invoices table
 CREATE TABLE invoices (
     id SERIAL PRIMARY KEY,
-    patient_id TEXT NOT NULL REFERENCES patients(id),
+    patient_id INTEGER NOT NULL REFERENCES patients(id),
     appointment_id INTEGER REFERENCES appointments(id),
     invoice_number TEXT UNIQUE NOT NULL,
     total_amount DECIMAL(10,2) NOT NULL CHECK (total_amount >= 0),
@@ -168,7 +167,7 @@ CREATE TABLE payments (
     payment_method payment_method NOT NULL,
     payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     transaction_reference TEXT,
-    processed_by TEXT NOT NULL REFERENCES users(id),
+    processed_by INTEGER NOT NULL REFERENCES users(id),
     notes TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -186,7 +185,7 @@ CREATE TABLE insurance_providers (
 -- Patient insurance policies table
 CREATE TABLE patient_insurance (
     id SERIAL PRIMARY KEY,
-    patient_id TEXT NOT NULL REFERENCES patients(id),
+    patient_id INTEGER NOT NULL REFERENCES patients(id),
     provider_id INTEGER NOT NULL REFERENCES insurance_providers(id),
     policy_number TEXT NOT NULL,
     coverage_details JSONB,
@@ -215,7 +214,7 @@ CREATE TABLE insurance_claims (
 -- Audit log table
 CREATE TABLE audit_log (
     id SERIAL PRIMARY KEY,
-    user_id TEXT REFERENCES users(id),
+    user_id INTEGER REFERENCES users(id),
     action TEXT NOT NULL,
     table_name TEXT NOT NULL,
     record_id TEXT NOT NULL,
